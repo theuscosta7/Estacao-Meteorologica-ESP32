@@ -1,0 +1,19 @@
+dependencies:
+  protocol_examples_common:
+    path: ${IDF_PATH}/examples/common_components/protocol_examples_common
+  espressif/esp_wifi_remote:
+    version: ">=0.1.12"
+    rules:
+      - if: "target in [esp32p4, esp32h2]"
+  esp_idf_lib_helpers:
+    version: "*"
+    git: https://github.com/UncleRus/esp-idf-lib.git
+    path: components/esp_idf_lib_helpers
+  i2cdev:
+    version: "*"
+    git: https://github.com/UncleRus/esp-idf-lib.git
+    path: components/i2cdev
+  bme680:
+    version: "*"
+    git: https://github.com/UncleRus/esp-idf-lib.git
+    path: components/bme680

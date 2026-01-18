@@ -1,0 +1,43 @@
+dependencies:
+  bme680:
+    component_hash: 002a1a4bcc096f6403082252a31c3b5f33c85e607846664d57e6545b926f4f25
+    dependencies: []
+    source:
+      git: https://github.com/UncleRus/esp-idf-lib.git
+      path: components/bme680
+      type: git
+    version: e82d88daaf8ac764718f30d21811213b431c392d
+  esp_idf_lib_helpers:
+    component_hash: 32ab64af43dc9b3b45871add88dc7b04f9ee17bb587d4d14d7e117bb02a84edf
+    dependencies: []
+    source:
+      git: https://github.com/UncleRus/esp-idf-lib.git
+      path: components/esp_idf_lib_helpers
+      type: git
+    version: e82d88daaf8ac764718f30d21811213b431c392d
+  i2cdev:
+    component_hash: 5edced0a37b5ff0e79763ca3ed2c617fbd46c2285dbb1f38118a54f044d4097f
+    dependencies: []
+    source:
+      git: https://github.com/UncleRus/esp-idf-lib.git
+      path: components/i2cdev
+      type: git
+    version: e82d88daaf8ac764718f30d21811213b431c392d
+  idf:
+    source:
+      type: idf
+    version: 5.5.1
+  protocol_examples_common:
+    dependencies: []
+    source:
+      path: C:\Users\Public\Documents\ESPIDF\v5.5.1\esp-idf\examples\common_components\protocol_examples_common
+      type: local
+    version: '*'
+direct_dependencies:
+- bme680
+- esp_idf_lib_helpers
+- i2cdev
+- protocol_examples_common
+manifest_hash: df56455febf76c21b8b6d2dc1003269019c7ce847ae0cda9b4fd9cc33cba32a7
+target: esp32
+version: 2.0.0
