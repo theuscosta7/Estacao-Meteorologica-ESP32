@@ -99,7 +99,6 @@ static bool check_sensor(void)
 {
     ESP_LOGI(TAG, "Verificando sensor BME680...");
 
-    // Lê Chip ID
     uint8_t chip_id;
     if (i2c_read(0xD0, &chip_id, 1) != ESP_OK)
     {
@@ -116,14 +115,14 @@ static bool check_sensor(void)
     }
 
     // Tenta configurar
-    i2c_write(0xE0, 0xB6); // Reset
+    i2c_write(0xE0, 0xB6);
     vTaskDelay(pdMS_TO_TICKS(100));
 
-    i2c_write(0x72, 0x02); // Humidity OS 2x
-    i2c_write(0x74, 0x2B); // Temp OS 2x, Press OS 4x, Forced
-    i2c_write(0x75, 0x14); // Filter 4
+    i2c_write(0x72, 0x02); 
+    i2c_write(0x74, 0x2B); 
+    i2c_write(0x75, 0x14); 
 
-    ESP_LOGI(TAG, "✓ BME680 detectado (mesmo que possa estar defeituoso)");
+    ESP_LOGI(TAG, "BME680 detectado (mesmo que possa estar defeituoso)");
     return true;
 }
 
@@ -133,18 +132,18 @@ static bool try_read_real_sensor(sensor_data_t *data)
     if (!sensor_available)
         return false;
 
-    // Inicia medição
+    
     i2c_write(0x74, 0x2B);
     vTaskDelay(pdMS_TO_TICKS(200));
 
-    // Lê dados
+    
     uint8_t raw[15];
     if (i2c_read(0x1F, raw, 15) != ESP_OK)
     {
         return false;
     }
 
-    // Verifica se não são todos zeros
+
     bool all_zeros = true;
     for (int i = 0; i < 15; i++)
     {
@@ -161,7 +160,7 @@ static bool try_read_real_sensor(sensor_data_t *data)
         return false;
     }
 
-    // Extrai valores (cálculo simplificado)
+    
     uint32_t temp_raw = ((uint32_t)raw[5] << 12) | ((uint32_t)raw[6] << 4) | (raw[7] >> 4);
     uint32_t press_raw = ((uint32_t)raw[2] << 12) | ((uint32_t)raw[3] << 4) | (raw[4] >> 4);
     uint16_t hum_raw = ((uint16_t)raw[7] << 8) | raw[8];
@@ -181,7 +180,6 @@ static bool try_read_real_sensor(sensor_data_t *data)
         data->co2 = 400.0;
     }
 
-    // Validação
     if (data->temperature < -40 || data->temperature > 85 ||
         data->pressure < 300 || data->pressure > 1100)
     {
@@ -195,12 +193,11 @@ static bool try_read_real_sensor(sensor_data_t *data)
 /* ================= GERA DADOS SIMULADOS ================= */
 static void generate_simulated_data(sensor_data_t *data, int cycle)
 {
-    // Base realista com variação
+    
     float base_temp = 25.0;
     float base_hum = 55.0;
     float base_press = 1013.0;
 
-    // Variação cíclica
     float temp_variation = sin(cycle * 0.1) * 3.0;
     float hum_variation = sin(cycle * 0.15) * 10.0;
     float press_variation = sin(cycle * 0.05) * 5.0;
@@ -212,7 +209,6 @@ static void generate_simulated_data(sensor_data_t *data, int cycle)
     data->co2 = 500 + sin(cycle * 0.25) * 200;
     data->is_real_data = false;
 
-    // Limites
     if (data->humidity < 30)
         data->humidity = 30;
     if (data->humidity > 80)
@@ -230,7 +226,6 @@ static char *create_json_payload(sensor_data_t *data)
     if (!json)
         return NULL;
 
-    // Garante valores válidos
     float co2 = data->co2;
     if (isinf(co2) || isnan(co2))
         co2 = 400.0;
@@ -271,11 +266,11 @@ static void send_data_to_server(sensor_data_t *data)
     if (err == ESP_OK)
     {
         int status = esp_http_client_get_status_code(client);
-        ESP_LOGI(TAG, "✓ POST Status: %d", status);
+        ESP_LOGI(TAG, "POST Status: %d", status);
     }
     else
     {
-        ESP_LOGE(TAG, "✗ POST Erro: %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "POST Erro: %s", esp_err_to_name(err));
     }
 
     esp_http_client_cleanup(client);
@@ -287,7 +282,6 @@ static void sensor_task(void *pvParameter)
 {
     ESP_LOGI(TAG, "Task sensor iniciada");
 
-    // Verifica sensor
     sensor_available = check_sensor();
 
     if (!sensor_available)
@@ -303,7 +297,7 @@ static void sensor_task(void *pvParameter)
 
     int cycle = 0;
     int real_read_fails = 0;
-    const int MAX_REAL_FAILS = 5;
+    const int MAX_REAL_FAILS = 2;
 
     while (1)
     {
@@ -336,7 +330,6 @@ static void sensor_task(void *pvParameter)
             }
         }
 
-        // Se não conseguiu dados reais, gera simulados
         if (!real_data_ok)
         {
             generate_simulated_data(&data, cycle);
@@ -344,7 +337,6 @@ static void sensor_task(void *pvParameter)
                      data.temperature, data.humidity, data.pressure);
         }
 
-        // Envia dados
         send_data_to_server(&data);
 
         ESP_LOGI(TAG, "Aguardando 30 segundos...");
@@ -369,21 +361,17 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    // Inicializa rede
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    // Conecta WiFi
     ESP_LOGI(TAG, "Conectando WiFi...");
     ESP_ERROR_CHECK(example_connect());
-    ESP_LOGI(TAG, "✓ WiFi conectado!");
+    ESP_LOGI(TAG, "WiFi conectado!");
 
-    // Inicializa I2C
     init_i2c();
 
     vTaskDelay(pdMS_TO_TICKS(2000));
 
-    // Cria task
     xTaskCreate(sensor_task, "sensor_task", 8192, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "Sistema iniciado com sucesso!");

@@ -6,5 +6,5 @@ idf_component_register(
         esp_netif
         nvs_flash
         bme680
-        driver  # <-- ADICIONE ESTA LINHA
+        driver
 )
