@@ -297,7 +297,7 @@ static void sensor_task(void *arg)
             ESP_LOGE(TAG, "Falha na leitura do BMP280");
         }
 
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(30000));
     }
 }
 

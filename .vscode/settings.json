@@ -17,5 +17,6 @@
     "--compile-commands-dir=c:\\Users\\Mateus Dos Santos\\projetoIntegrado\\build"
   ],
   "idf.flashType": "UART",
-  "idf.monitorPort": "COM5"
+  "idf.monitorPort": "COM5",
+  "idf.currentSetup": "c:\\Users\\Public\\Documents\\ESPIDF\\v5.5.1\\esp-idf"
 }
